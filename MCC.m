@@ -130,7 +130,11 @@ figure1 = figure('Name','Soil is Normally Consolidated','Color',[1 1 1]);
 else
 figure1 = figure('Name','Soil is Over Consolidated','Color',[1 1 1]);
 end
+if f==2
+    figure1 = figure(1);
+else
 subplot(r,c,1,'parent',figure1)%Deviatoric Stress Vs. Axial Strain
+end
 plot(es,q)
 xlabel('Axial strain, \epsilon_a (%)')
 ylabel('Deviatoric Stress, q (kPa)')
@@ -147,9 +151,6 @@ if f==2%Deviatoric Stress Vs. Axial Strain
     xlabel('Mean Stress, p (kPa)')
     ylabel('Deviatoric Stress, q (kPa)')
     title('Stress Path')
-    saveas(figure2,'StressPath','fig')
-    print(figure2,'-depsc2','StressPath.eps')
-    print(figure2,'-dtiff','-r600','StressPath.tiff')
 else subplot(r,c,2,'parent',figure1), 
     if OCR<=1
         plot(p,q,p1,q1);
@@ -164,21 +165,33 @@ end
 if f==2%Excess Pore water Pressure;
     figure3=figure(3);
     plot(es,u);
-    saveas(figure3,'ExcessPWP_vs_AxialStrain','fig')
-    print(figure3,'-depsc2','ExcessPWP_vs_AxialStrain.eps')
-    print(figure3,'-dtiff','-r600','ExcessPWP_vs_AxialStrain.tiff')
 else
     subplot(r,c,3,'parent',figure1), plot(es,u)
 end
 xlabel('Axial strain, \epsilon_a (%)')
 ylabel('Excess Pore Water Pressure, u (kPa)')
 title('Excess Pore Water Pressure Vs. Axial Strain')
+
+% Create an output folder
+status = mkdir('Output');
+cd('Output');
+
 if f==2
-saveas(figure1,'DeviatoricStress_vs_AxialStrain','fig')
-print(figure1,'-depsc2','DeviatoricStress_vs_AxialStrain.eps')
-print(figure1,'-dtiff','-r600','DeviatoricStress_vs_AxialStrain.tiff')
+    saveas(figure1,'DeviatoricStress_vs_AxialStrain','fig')
+    print(figure1,'-depsc2','DeviatoricStress_vs_AxialStrain.eps')
+    print(figure1,'-dtiff','-r600','DeviatoricStress_vs_AxialStrain.tiff')
+
+    saveas(figure2,'StressPath','fig')
+    print(figure2,'-depsc2','StressPath.eps')
+    print(figure2,'-dtiff','-r600','StressPath.tiff')
+    
+    saveas(figure3,'ExcessPWP_vs_AxialStrain','fig')
+    print(figure3,'-depsc2','ExcessPWP_vs_AxialStrain.eps')
+    print(figure3,'-dtiff','-r600','ExcessPWP_vs_AxialStrain.tiff')
 else
-saveas(figure1,'MCC','fig')
-print(figure1,'-depsc2','MCC.eps')
-print(figure1,'-dtiff','-r600','MCC.tiff')
+    saveas(figure1,'MCC','fig')
+    print(figure1,'-depsc2','MCC.eps')
+    print(figure1,'-dtiff','-r600','MCC.tiff')
 end
+
+cd ../
