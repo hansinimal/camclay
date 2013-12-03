@@ -34,14 +34,14 @@ out12=fprintf('\n\t\t view license agreement at http://www.gnu.org/licenses/\n')
     out4=fprintf('\nSTRAIN INCREAMENT AND ITERATION\n\n');
     iteration=input('Enter number of iterations to perform  (eg., 5000) = ');
     if (iteration <=2000 || iteration == ' ')
-    out5=fprintf('\nThe iterations entered is too low using defaults\n');
     iter=2000;
+    out5=fprintf('\nThe iterations entered is too low using defaults %f\n',iter);
     else iter=iteration;
     end
     strsteps=input('Enter the strain increament (in decimal) (eg., 0.01) = ');
-    if (strsteps > 0.01|| strsteps == ' ')
-    out6=fprintf('\nThe strain step entered is too low using defaults\n');
+    if (strsteps > 0.01|| strsteps == ' ' || strsteps <= 0.)
     ide=0.01;
+    out6=fprintf('\nThe strain step entered is too low using defaults %f\n',ide);
     else ide=strsteps;
     end
     de=ide/100;
@@ -124,7 +124,7 @@ else if f==2, r=1;c=1;
         f=input('Plot Request: (1) Single Page; (2)Multiple Page =');
     end
 end
-disp('The Stress Path and other plots are sucessfully generated');
+disp('The Stress Path and other plots are being generated...');
 if OCR<=1 
 figure1 = figure('Name','Soil is Normally Consolidated','Color',[1 1 1]);
 else
@@ -136,16 +136,25 @@ xlabel('Axial strain, \epsilon_a (%)')
 ylabel('Deviatoric Stress, q (kPa)')
 title('Deviatoric Stress Vs. Axial Strain')
 if f==2%Deviatoric Stress Vs. Axial Strain
-    if OCR<=1,figure(2);plot(p,q,p1,q1,'color',red);
-    else figure(2);plot(p,q,p1,q1,p1,qy,'color',red);
+    if OCR<=1
+        figure2=figure(2);
+        plot(p,q,p1,q1);
+    else
+        figure2=figure(2);
+        plot(p,q,p1,q1,p1,qy);
+    end
     axis equal
     xlabel('Mean Stress, p (kPa)')
     ylabel('Deviatoric Stress, q (kPa)')
     title('Stress Path')
-    end
+    saveas(figure2,'StressPath','fig')
+    print(figure2,'-depsc2','StressPath.eps')
+    print(figure2,'-dtiff','-r600','StressPath.tiff')
 else subplot(r,c,2,'parent',figure1), 
-    if OCR<=1,plot(p,q,p1,q1);
-    else plot(p,q,p1,q1,p1,qy);
+    if OCR<=1
+        plot(p,q,p1,q1);
+    else
+        plot(p,q,p1,q1,p1,qy);
     end
     axis equal
     xlabel('Mean Stress, p (kPa)')
@@ -153,10 +162,23 @@ else subplot(r,c,2,'parent',figure1),
     title('Stress Path')
 end
 if f==2%Excess Pore water Pressure;
-   figure(3);plot(es,u);
-else subplot(r,c,3,'parent',figure1), plot(es,u)
+    figure3=figure(3);
+    plot(es,u);
+    saveas(figure3,'ExcessPWP_vs_AxialStrain','fig')
+    print(figure3,'-depsc2','ExcessPWP_vs_AxialStrain.eps')
+    print(figure3,'-dtiff','-r600','ExcessPWP_vs_AxialStrain.tiff')
+else
+    subplot(r,c,3,'parent',figure1), plot(es,u)
 end
 xlabel('Axial strain, \epsilon_a (%)')
 ylabel('Excess Pore Water Pressure, u (kPa)')
 title('Excess Pore Water Pressure Vs. Axial Strain')
-
+if f==2
+saveas(figure1,'DeviatoricStress_vs_AxialStrain','fig')
+print(figure1,'-depsc2','DeviatoricStress_vs_AxialStrain.eps')
+print(figure1,'-dtiff','-r600','DeviatoricStress_vs_AxialStrain.tiff')
+else
+saveas(figure1,'MCC','fig')
+print(figure1,'-depsc2','MCC.eps')
+print(figure1,'-dtiff','-r600','MCC.tiff')
+end
