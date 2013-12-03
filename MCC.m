@@ -21,24 +21,24 @@ out12=fprintf('\n\t\t view license agreement at http://www.gnu.org/licenses/\n')
 %}
 %% Input Parameters
     out3=fprintf('\nINPUT PARAMETERS FOR MODIFIED CAMCLAY\n\n');
-    cp=input('Enter the inital Consolidation pressure (kPa)   = ');%cp=150;   
-    p0=input('Enter the initial Confining pressure (kPa)      = ');%p0=150;
-    M=input('Enter the value of Critical Friction Anlge M    = ');%M=0.95;
-    l=input('Enter the value of Lamda                        = ');%l=0.2;
-    k=input('Enter the value of Kappa                        = ');%k=0.04;    
-    N=input('Enter the value of N                            = ');%N=2.5;
-    v=input('Enter the value of poissons ratio               = ');%v=0.15;
+    cp=input('Enter the inital Consolidation pressure (kPa) (eg., 150 kPa)  = ');%cp=150;   
+    p0=input('Enter the initial Confining pressure (kPa)    (eg., 150 kPa)  = ');%p0=150;
+    M=input('Enter the value of Critical Friction Anlge M   (eg., 0.95) = ');%M=0.95;
+    l=input('Enter the value of Lamda                       (eg., 0.2) = ');%l=0.2;
+    k=input('Enter the value of Kappa                       (eg., 0.04) = ');%k=0.04;    
+    N=input('Enter the value of N                           (eg., 2.5) = ');%N=2.5;
+    v=input('Enter the value of poissons ratio              (eg., 0.15) = ');%v=0.15;
 %% Computation of Other Parameters (V,e0 and OCR)
     pc=cp;V=N-(l*log(pc));e0=V-1;OCR=cp/p0;%Initalizing confining pressure
 %% Strain Increament and Strain Matrix Definition
     out4=fprintf('\nSTRAIN INCREAMENT AND ITERATION\n\n');
-    iteration=input('Enter number of iterations to perform           = ');
+    iteration=input('Enter number of iterations to perform  (eg., 5000) = ');
     if (iteration <=2000 || iteration == ' ')
     out5=fprintf('\nThe iterations entered is too low using defaults\n');
     iter=2000;
     else iter=iteration;
     end
-    strsteps=input('Enter the strain increament (in decimal)        = ');
+    strsteps=input('Enter the strain increament (in decimal) (eg., 0.01) = ');
     if (strsteps > 0.01|| strsteps == ' ')
     out6=fprintf('\nThe strain step entered is too low using defaults\n');
     ide=0.01;
