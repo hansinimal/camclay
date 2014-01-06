@@ -22,21 +22,21 @@ out12=fprintf('\n\t\t view license agreement at http://www.gnu.org/licenses/\n')
 
 %% Input Parameters
     out3=fprintf('\nInput Parameters for Modified Cam-Clay\n\n');
-    cp=input('Enter the inital Consolidation pressure (kPa) (eg., 150 kPa)  = ');cp=150;   
-    p0=input('Enter the initial Confining pressure (kPa)    (eg., 150 kPa)  = ');p0=100;
-    M=input('Enter the value of Critical Friction Anlge M   (eg., 0.95) = ');M=0.95;
-    l=input('Enter the value of Lamda                       (eg., 0.2) = ');l=0.2;
-    k=input('Enter the value of Kappa                       (eg., 0.04) = ');k=0.04;    
-    N=input('Enter the value of N                           (eg., 2.5) = ');N=2.5;
-    v=input('Enter the value of poissons ratio              (eg., 0.15) = ');v=0.15;
+    cp=input('Enter the inital Consolidation pressure (kPa) (eg., 150 kPa)  = ');%cp=150;   
+    p0=input('Enter the initial Confining pressure (kPa)    (eg., 150 kPa)  = ');%p0=100;
+    M=input('Enter the value of Critical Friction Anlge M   (eg., 0.95) = ');%M=0.95;
+    l=input('Enter the value of Lamda                       (eg., 0.2) = ');%l=0.2;
+    k=input('Enter the value of Kappa                       (eg., 0.04) = ');%k=0.04;    
+    N=input('Enter the value of N                           (eg., 2.5) = ');%N=2.5;
+    v=input('Enter the value of poissons ratio              (eg., 0.15) = ');%v=0.15;
     analysis = input('Enter the type of Analysis: (1) Triaxial Drained (2) Triaxial Undrained = '); %and (3) Oedometer drained = '); %analysis=1;
 %% Computation of Other Parameters (V,e0 and OCR)
     pc=cp;V=N-(l*log(pc));e0=V-1;OCR=cp/p0;%Initalizing confining pressure
 %% Strain Increament and Strain Matrix Definition
     out4=fprintf('\nSTRAIN INCREAMENT AND ITERATION\n\n');
-    iteration=input('Enter number of iterations to perform  (eg., 5000) = ');
-    if (iteration <=2000 || iteration == ' ')
-    iter=2000;
+    iteration=input('Enter number of iterations to perform  (eg., 7500) = ');
+    if (iteration < 7500 || iteration == ' ')
+    iter=7500;
     out5=fprintf('\nThe iterations entered is too low using defaults %f\n',iter);
     else iter=iteration;
     end
@@ -50,9 +50,9 @@ out12=fprintf('\n\t\t view license agreement at http://www.gnu.org/licenses/\n')
     es=0:ide:(iter-1)*ide; %strain
 
     if analysis==1, %Triaxial Drained
-       out13 = fprintf('\n Triaxial Drained Simulation in progress ... \n');
+       out13 = fprintf('\n Triaxial Drained Simulation is in progress ... \n');
     else if analysis==2, %Triaxial Undrained
-       out14 = fprintf('\n Triaxial Undrained Simulation in progress ... \n');
+       out14 = fprintf('\n Triaxial Undrained Simulation is in progress ... \n');
 	 else %Oedometer Drained (analysis=3)
 %	   out15 = fprintf('\n Oedometer Drained Simulation in progress ... \n');
 	 end
