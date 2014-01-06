@@ -1,8 +1,8 @@
 %% MATLAB Code for Cam-Clay Model 
 clear all;
 %% License
-out1=fprintf('\n \t\t   MATLAB CODE FOR SIMULATION OF MODIFIED CAMCLAY\n');
-out2=fprintf('\t Copyright (C) 2011 Krishna Kumar, University of Cambridge\n');
+out1=fprintf('\n \t\t Octave/Matlab code for Simulation of Modified CamClay\n');
+out2=fprintf('\t\t Copyright (C) 2011 Krishna Kumar, University of Cambridge\n');
 out11=fprintf('\n\t\t\t The program is distributed under GNU GPL v 2.0 ');
 out12=fprintf('\n\t\t view license agreement at http://www.gnu.org/licenses/\n');
 %{   
@@ -30,8 +30,10 @@ out12=fprintf('\n\t\t view license agreement at http://www.gnu.org/licenses/\n')
     N=input('Enter the value of N                           (eg., 2.5) = ');%N=2.5;
     v=input('Enter the value of poissons ratio              (eg., 0.15) = ');%v=0.15;
     analysis = input('Enter the type of Analysis: (1) Triaxial Drained (2) Triaxial Undrained = '); %and (3) Oedometer drained = '); %analysis=1;
+
 %% Computation of Other Parameters (V,e0 and OCR)
     pc=cp;V=N-(l*log(pc));e0=V-1;OCR=cp/p0;%Initalizing confining pressure
+
 %% Strain Increament and Strain Matrix Definition
     out4=fprintf('\nSTRAIN INCREAMENT AND ITERATION\n\n');
     iteration=input('Enter number of iterations to perform  (eg., 7500) = ');
