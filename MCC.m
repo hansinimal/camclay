@@ -4,8 +4,7 @@
 %{   
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+    the Free Software Foundation, version 2 of the License.
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -34,7 +33,7 @@ clear all;
     l=input( 'Enter the value of Lamda                      (eg., 0.2)      = ');
     k=input( 'Enter the value of Kappa                      (eg., 0.04)     = ');
     N=input( 'Enter the value of N                          (eg., 2.5)      = ');
-    v=input( 'Enter the value of poissons ratio             (eg., 0.15)     = ');
+    nu=input('Enter the value of poissons ratio             (eg., 0.15)     = ');
     analysis = input('Enter the type of Analysis: (1) Triaxial Drained (2) Triaxial Undrained = ');
     
     display(' ');
@@ -42,7 +41,7 @@ clear all;
       display('Triaxial Drained Simulation is in progress ...');
     else if analysis==2, % Triaxial Undrained
 	   display('Triaxial Undrained Simulation is in progress ...');
-	 else            % Oedometer Drained 
+	 else           
 	   display('Octave/Matlab code handles only Triaxial Drained and Undrained simulations!');
 	   quit;
 	 end
@@ -73,7 +72,7 @@ clear all;
     end
 
     de=ide/100;
-    es=0:ide:(iter-1)*ide; %strain
+    es=0:ide:(iter-1)*ide; % Strain
 
 
 
@@ -82,7 +81,7 @@ clear all;
     dfds=zeros(6,1);
     dfdep=zeros(6,1);
     u=zeros(iter,1);    % Pore Water Pressure
-    p=zeros(iter,1);    % Mean Effectiv Stress
+    p=zeros(iter,1);    % Mean Effective Stress
     q=zeros(iter,1);    % Deviatoric Stress
     dStrain=zeros(6,1); % Increamental Strain
     void=zeros(iter,1); % Void ratio
@@ -95,17 +94,18 @@ clear all;
     qy=(M^2*(pc*p_ini_yield-p_ini_yield.^2)).^0.5; % Plot the initial yield locus
 
 %% Initialize   
-     a=1;
-     S=[p0;p0;p0;0;0;0];
-     strain=[0;0;0;0;0;0];
-     p(a)=(S(1)+2*S(3))/3;
+     a=1;                               % Iterator
+     S=[p0;p0;p0;0;0;0];                % Stress 
+     strain=[0;0;0;0;0;0];              % Strain
+     p(a)=(S(1)+2*S(3))/3;                
      q(a)=(S(1)-S(3));
      yield=(q(a)^2/M^2+p(a)^2)-p(a)*pc; % Defining the yield surface
      void(a)=e0;
 
 %% CamClay Iteration Uni-Loop Iteration for OC/NC & Inside/Outside Yield
      while a<iter
-       K=V*p(a)/k;G=(3*K*(1-2*v))/(2*(1+v));
+       K=V*p(a)/k;                     % Bulk Modulus
+       G=(3*K*(1-2*nu))/(2*(1+nu));      % Shear Modulus
        if yield==0, pc=(q(a)^2/M^2+p(a)^2)/p(a); 
        else pc=cp;
        end
