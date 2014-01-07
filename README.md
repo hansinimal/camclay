@@ -1,5 +1,5 @@
-ModifiedCamClay
-===============
+Modified Cam Clay
+=================
 
 > A GNU Octave/MATLAB code for Modified Cam Clay in FE formulation for Element Testing.
 
@@ -15,5 +15,7 @@ There is ABSOLUTELY NO WARRANTY; not even for MERCHANTABILITY or FITNESS FOR A P
 
 ## To Run
 * GNU Octave
+
+
 			octave MCC.m
 
