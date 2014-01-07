@@ -1,10 +1,6 @@
 %% MATLAB Code for Cam-Clay Model 
-clear all;
-%% License
-out1=fprintf('\n \t\t Octave/Matlab code for Simulation of Modified CamClay\n');
-out2=fprintf('\t\t Copyright (C) 2011 Krishna Kumar, University of Cambridge\n');
-out11=fprintf('\n\t\t\t The program is distributed under GNU GPL v 2.0 ');
-out12=fprintf('\n\t\t view license agreement at http://www.gnu.org/licenses/\n');
+%% Author: Krishna Kumar, University of Cambridge
+%% GNU GPL V2.0 License
 %{   
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,22 +16,35 @@ out12=fprintf('\n\t\t view license agreement at http://www.gnu.org/licenses/\n')
     along with this program.  If not, see <http://www.gnu.org/licenses/>');
 %}
 
+clear all;
+%% License
+display(' ');
+display('Octave/Matlab code for Simulation of Modified CamClay');
+display('Krishna Kumar, University of Cambridge');
+display('The program is distributed under GNU GPL v 2.0 ');
+
 %% Input Parameters
-    out3=fprintf('\nInput Parameters for Modified Cam-Clay\n\n');
-    cp=input('Enter the inital Consolidation pressure (kPa) (eg., 150 kPa)  = ');%cp=150;   
-    p0=input('Enter the initial Confining pressure (kPa)    (eg., 150 kPa)  = ');%p0=100;
-    M=input('Enter the value of Critical Friction Anlge M   (eg., 0.95) = ');%M=0.95;
-    l=input('Enter the value of Lamda                       (eg., 0.2) = ');%l=0.2;
-    k=input('Enter the value of Kappa                       (eg., 0.04) = ');%k=0.04;    
-    N=input('Enter the value of N                           (eg., 2.5) = ');%N=2.5;
-    v=input('Enter the value of poissons ratio              (eg., 0.15) = ');%v=0.15;
-    analysis = input('Enter the type of Analysis: (1) Triaxial Drained (2) Triaxial Undrained = '); %and (3) Oedometer drained = '); %analysis=1;
+display(' ');
+display('Input Parameters for Modified Cam-Clay:');
+
+cp=input('Enter the inital Consolidation pressure (kPa) (eg., 150 kPa)  = ');%cp=150;   
+p0=input('Enter the initial Confining pressure (kPa)    (eg., 150 kPa)  = ');%p0=100;
+M=input('Enter the value of Critical Friction Anlge M   (eg., 0.95) = ');%M=0.95;
+l=input('Enter the value of Lamda                       (eg., 0.2) = ');%l=0.2;
+k=input('Enter the value of Kappa                       (eg., 0.04) = ');%k=0.04;    
+N=input('Enter the value of N                           (eg., 2.5) = ');%N=2.5;
+v=input('Enter the value of poissons ratio              (eg., 0.15) = ');%v=0.15;
+analysis = input('Enter the type of Analysis: (1) Triaxial Drained (2) Triaxial Undrained = '); %and (3) Oedometer drained = '); %analysis=1;
 
 %% Computation of Other Parameters (V,e0 and OCR)
-    pc=cp;V=N-(l*log(pc));e0=V-1;OCR=cp/p0;%Initalizing confining pressure
+    pc=cp;
+    V=N-(l*log(pc));
+    e0=V-1;
+    OCR=cp/p0;%Initalizing confining pressure
 
 %% Strain Increament and Strain Matrix Definition
-    out4=fprintf('\nSTRAIN INCREAMENT AND ITERATION\n\n');
+    display(' ');
+    display('Strain increament and iteration:');
     iteration=input('Enter number of iterations to perform  (eg., 7500) = ');
     if (iteration < 7500 || iteration == ' ')
     iter=7500;
@@ -51,23 +60,24 @@ out12=fprintf('\n\t\t view license agreement at http://www.gnu.org/licenses/\n')
     de=ide/100;
     es=0:ide:(iter-1)*ide; %strain
 
+    display(' ');
     if analysis==1, %Triaxial Drained
-       out13 = fprintf('\n Triaxial Drained Simulation is in progress ... \n');
+       display('Triaxial Drained Simulation is in progress ...');
     else if analysis==2, %Triaxial Undrained
-       out14 = fprintf('\n Triaxial Undrained Simulation is in progress ... \n');
+       display('Triaxial Undrained Simulation is in progress ...');
 	 else %Oedometer Drained (analysis=3)
-%	   out15 = fprintf('\n Oedometer Drained Simulation in progress ... \n');
+%	   display('Oedometer Drained Simulation in progress ...');
 	 end
     end
 
 %% Block Memory allocation
-    De=zeros(1,6);
+    De=zeros(6,6);
     dfds=zeros(6,1);
     dfdep=zeros(6,1);
-    u=zeros(1,iter);
-    p=zeros(1,iter);
-    q=zeros(1,iter);
-    dstrain=zeros(6,1);%[de;-de/2.0;-de/2.0;0;0;0];%strain increament
+    u=zeros(iter,1);
+    p=zeros(iter,1);
+    q=zeros(iter,1);
+    dstrain=zeros(6,1);
 
 %% Yield Surface and Conditions
     p_ini_yield=(0:pc);% CSL in p-q space
@@ -120,10 +130,8 @@ while a<iter
   %Stress and Strain Updates
   if analysis==1, %Triaxial Drained
     dstrain=[de;-1*D(2,1)/(D(2,2)+D(2,3))*de;-1*D(3,1)/(D(3,2)+D(3,3))*de;0.;0.;0.];
-
   else if analysis==2, %Triaxial Undrained
 	 dstrain=[de;-de/2.;-de/2.;0.;0.;0.];
-
        else %Oedometer Drained (analysis=3)
 %	 dstrain=[de;0.;0.;0.;0.;0.];
        end
@@ -148,23 +156,25 @@ end
     q_fyield = M*p_fyield;
     qyf = (M^2*(pc*p_fyield-p_fyield.^2)).^0.5;%Plot the final yield locus
 
-
 %% Results and Plots
 if OCR<=1 
   out7=fprintf('\n Soil is Normally Consolidated with a OCR of = %d \n',OCR);
 else
   out8=fprintf('\n Soil is Over Consolidated with a OCR of = %d \n',OCR);
 end
+
+display(' ');
 disp('Choose your Plot Options, Enter number in bracket');
 f=input('Plot Request: (1) Single Page; (2)Multiple Page =');
 
 if f==1, r=2;c=2; 
 else if f==2, r=1;c=1; 
-     else out9=fprintf('\nEnter either 1 or 2 \n');
+     else display('Enter either 1 or 2');
        f=input('Plot Request: (1) Single Page; (2)Multiple Page =');
      end
 end
 
+display(' ');
 disp('The Stress Path and other plots are being generated...');
 
 if OCR<=1 
