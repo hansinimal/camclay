@@ -1,4 +1,4 @@
-%% MATLAB Code for Cam-Clay Model 
+%% Matlab Code for Cam-Clay Model (Drained and Undrained)
 %% Author: Krishna Kumar, University of Cambridge
 %% GNU GPL V2.0 License
 %{   
@@ -17,7 +17,8 @@
 %}
 
 clear all;
-%% License
+
+%% Display Product Name, Author and License Information
 display(' ');
 display('Octave/Matlab code for Simulation of Modified CamClay');
 display('Krishna Kumar, University of Cambridge');
@@ -27,62 +28,68 @@ display('The program is distributed under GNU GPL v 2.0 ');
 display(' ');
 display('Input Parameters for Modified Cam-Clay:');
 
-cp=input('Enter the inital Consolidation pressure (kPa) (eg., 150 kPa)  = ');%cp=150;   
-p0=input('Enter the initial Confining pressure (kPa)    (eg., 150 kPa)  = ');%p0=100;
-M=input('Enter the value of Critical Friction Anlge M   (eg., 0.95) = ');%M=0.95;
-l=input('Enter the value of Lamda                       (eg., 0.2) = ');%l=0.2;
-k=input('Enter the value of Kappa                       (eg., 0.04) = ');%k=0.04;    
-N=input('Enter the value of N                           (eg., 2.5) = ');%N=2.5;
-v=input('Enter the value of poissons ratio              (eg., 0.15) = ');%v=0.15;
-analysis = input('Enter the type of Analysis: (1) Triaxial Drained (2) Triaxial Undrained = '); %and (3) Oedometer drained = '); %analysis=1;
+cp=input('Enter the inital Consolidation pressure (kPa) (eg., 150 kPa)  = ');
+p0=input('Enter the initial Confining pressure (kPa)    (eg., 150 kPa)  = ');
+M=input('Enter the value of Critical Friction Angle M   (eg., 0.95) = ');
+l=input('Enter the value of Lamda                       (eg., 0.2) = ');
+k=input('Enter the value of Kappa                       (eg., 0.04) = ');
+N=input('Enter the value of N                           (eg., 2.5) = ');
+v=input('Enter the value of poissons ratio              (eg., 0.15) = ');
+analysis = input('Enter the type of Analysis: (1) Triaxial Drained (2) Triaxial Undrained = '); %and (3) Oedometer drained = '); 
 
 %% Computation of Other Parameters (V,e0 and OCR)
     pc=cp;
-    V=N-(l*log(pc));
-    e0=V-1;
-    OCR=cp/p0;%Initalizing confining pressure
+    V=N-(l*log(pc))+(k*log(pc/p0)); % Specific Volume
+    e0=V-1;                         % Initial Void Ratio
+    OCR=cp/p0;                      % Over Consolidation Ratio
 
 %% Strain Increament and Strain Matrix Definition
     display(' ');
     display('Strain increament and iteration:');
+
     iteration=input('Enter number of iterations to perform  (eg., 7500) = ');
     if (iteration < 7500 || iteration == ' ')
     iter=7500;
     out5=fprintf('\nThe iterations entered is too low using defaults %f\n',iter);
     else iter=iteration;
     end
+
     strsteps=input('Enter the strain increament (in decimal) (eg., 0.01) = ');
     if (strsteps > 0.01|| strsteps == ' ' || strsteps <= 0.)
     ide=0.01;
     out6=fprintf('\nThe strain step entered is too low using defaults %f\n',ide);
     else ide=strsteps;
     end
+
     de=ide/100;
     es=0:ide:(iter-1)*ide; %strain
 
     display(' ');
-    if analysis==1, %Triaxial Drained
+    if analysis==1,      % Triaxial Drained
        display('Triaxial Drained Simulation is in progress ...');
-    else if analysis==2, %Triaxial Undrained
+    else if analysis==2, % Triaxial Undrained
        display('Triaxial Undrained Simulation is in progress ...');
-	 else %Oedometer Drained (analysis=3)
+	 else            % Oedometer Drained 
 %	   display('Oedometer Drained Simulation in progress ...');
 	 end
     end
 
 %% Block Memory allocation
-    De=zeros(6,6);
+    De=zeros(6,6);      % Stiffness Matrix
     dfds=zeros(6,1);
     dfdep=zeros(6,1);
-    u=zeros(iter,1);
-    p=zeros(iter,1);
-    q=zeros(iter,1);
-    dstrain=zeros(6,1);
+    u=zeros(iter,1);    % Pore Water Pressure
+    p=zeros(iter,1);    % Mean Effectiv Stress
+    q=zeros(iter,1);    % Deviatoric Stress
+    dStrain=zeros(6,1); % Increamental Strain
+    void=zeros(iter,1); % Void ratio
+    epsV=zeros(iter,1); % Volumetic Strain
+    epsD=zeros(iter,1); % Deviatoric Strain
 
 %% Yield Surface and Conditions
-    p_ini_yield=(0:pc);% CSL in p-q space
+    p_ini_yield=(0:pc);
     q_ini_yield = M*p_ini_yield;
-    qy=(M^2*(pc*p_ini_yield-p_ini_yield.^2)).^0.5;%Plot the initial yield locus
+    qy=(M^2*(pc*p_ini_yield-p_ini_yield.^2)).^0.5; % Plot the initial yield locus
 
 %% Initialize   
      a=1;
@@ -90,7 +97,8 @@ analysis = input('Enter the type of Analysis: (1) Triaxial Drained (2) Triaxial 
      strain=[0;0;0;0;0;0];
      p(a)=(S(1)+2*S(3))/3;
      q(a)=(S(1)-S(3));
-     yield=(q(a)^2/M^2+p(a)^2)-p(a)*pc; %Defining the yield surface
+     yield=(q(a)^2/M^2+p(a)^2)-p(a)*pc; % Defining the yield surface
+     void(a)=e0;
 
 %% CamClay Iteration Uni-Loop Iteration for OC/NC & Inside/Outside Yield
 while a<iter
@@ -129,40 +137,61 @@ while a<iter
 
   %Stress and Strain Updates
   if analysis==1, %Triaxial Drained
-    dstrain=[de;-1*D(2,1)/(D(2,2)+D(2,3))*de;-1*D(3,1)/(D(3,2)+D(3,3))*de;0.;0.;0.];
+    dStrain=[de;-1*D(2,1)/(D(2,2)+D(2,3))*de;-1*D(3,1)/(D(3,2)+D(3,3))*de;0.;0.;0.];
   else if analysis==2, %Triaxial Undrained
-	 dstrain=[de;-de/2.;-de/2.;0.;0.;0.];
+	 dStrain=[de;-de/2.;-de/2.;0.;0.;0.];
        else %Oedometer Drained (analysis=3)
-%	 dstrain=[de;0.;0.;0.;0.;0.];
+%	 dStrain=[de;0.;0.;0.;0.;0.];
        end
   end
-
-  dS=D*dstrain;
+  dS=D*dStrain;
   S=S+dS;
-  strain=strain+dstrain;
+  strain=strain+dStrain;
+  
+  depsV = dStrain(1) + dStrain (2) + dStrain (3); % Increamental Volumetric Strain
+  depsD = 2./3. * (dStrain(1) - dStrain(3));      % Increamental Deviatoric Strain
 
+  %Update Specific Volume
+  V=N-(l*log(pc))+(k*log(pc/p(a)));
+  
   %Subsequent cycle update
   a=a+1;
   p(a)=(S(1)+S(2)+S(3))/3;
   q(a)=S(1)-S(3);
   u(a)=p0+q(a)/3-p(a);
+
+  void(a) = V-1.0;
+  epsV(a) = epsV(a-1) + depsV;
+  epsD(a) = epsD(a-1) + depsD;
+
   if yield<0, yield=q(a)^2+M^2*p(a)^2-M^2*p(a)*pc;
   else yield=0;
   end
 end
 
+%% Normal Consolidation Line (NCL)
+    pNCL = (1:pc);
+    qNCL = M * pNCL;
+    eNCL = (N - l*log(pNCL)) - 1;
+
+%% Critical State Line (CSL)
+    pCSL = pNCL;
+    Gamma = 1+void(a)+l*log(p(a));
+    eCSL = (Gamma - l*log(pCSL)) - 1;
+    
 %% Final Yield Surface
     p_fyield = (0:pc);% CSL in p-q space
     q_fyield = M*p_fyield;
     qyf = (M^2*(pc*p_fyield-p_fyield.^2)).^0.5;%Plot the final yield locus
 
-%% Results and Plots
+%% Over Consolidation Ratio
 if OCR<=1 
   out7=fprintf('\n Soil is Normally Consolidated with a OCR of = %d \n',OCR);
 else
   out8=fprintf('\n Soil is Over Consolidated with a OCR of = %d \n',OCR);
 end
 
+%% Results and Plots
 display(' ');
 disp('Choose your Plot Options, Enter number in bracket');
 f=input('Plot Request: (1) Single Page; (2)Multiple Page =');
@@ -183,61 +212,76 @@ else
   figure1 = figure('Name','Soil is Over Consolidated','Color',[1 1 1]);
 end
 
+%% Plot: Deviatoric Stress Vs. Axial Strain
 if f==2
   figure1 = figure(1);
+  title('Deviatoric Stress Vs. Axial Strain')
 else
-  subplot(r,c,1,'parent',figure1)%Deviatoric Stress Vs. Axial Strain
+  subplot(r,c,1,'parent',figure1)
 end
 plot(es,q)
 xlabel('Axial strain, \epsilon_a (%)')
 ylabel('Deviatoric Stress, q (kPa)')
-title('Deviatoric Stress Vs. Axial Strain')
-if f==2 %Deviatoric Stress Vs. Axial Strain
+
+
+%% Plot: Stress Path
+if f==2 
   figure2=figure(2);
-  
-  if analysis == 2
-    plot(p,q,p_ini_yield,q_ini_yield,p_ini_yield,qy,p_fyield,qyf);
-  else if analysis == 1
-	 plot(p,q,p_ini_yield,qy,p_fyield,q_fyield,qyf);
-       end
-  end
-  axis equal
-  xlabel('Mean Stress, p (kPa)')
-  ylabel('Deviatoric Stress, q (kPa)')
   title('Stress Path')
-else subplot(r,c,2,'parent',figure1), 
-  if analysis == 2
-    plot(p,q,p_ini_yield,q_ini_yield,p_ini_yield,qy,p_fyield,qyf);
-  else if analysis == 1
-	 plot(p,q,p_ini_yield,qy,p_fyield,q_fyield,qyf);
-       end
-  end
-  axis equal
-  xlabel('Mean Stress, p (kPa)')
-  ylabel('Deviatoric Stress, q (kPa)')
-  title('Stress Path')
-end
-if f==2%Excess Pore water Pressure;
-  if analysis == 2 % Undrained Analysis
-    figure3=figure(3);
-    plot(es,u);
-  end
 else
-    if analysis == 2 % Undrained Analysis
-      subplot(r,c,3,'parent',figure1), plot(es,u)
-    end
+  subplot(r,c,2,'parent',figure1), 
 end
 
-if analysis == 2 % Undrained Analysis
-  xlabel('Axial strain, \epsilon_a (%)')
-  ylabel('Excess Pore Water Pressure, u (kPa)')
-  title('Excess Pore Water Pressure Vs. Axial Strain')
+if analysis == 1
+  plot(p,q,p_ini_yield,qy,p_fyield,q_fyield,qyf);
+else if analysis == 2
+       plot(p,q,p_ini_yield,q_ini_yield,p_ini_yield,qy,p_fyield,qyf);
+     end
+end
+axis equal
+xlabel('Mean Stress, p (kPa)')
+ylabel('Deviatoric Stress, q (kPa)')
+
+
+%% Plot: Pore Water Pressure /  Volumetric Strain
+if f==2
+  figure3=figure(3);
+else
+  subplot(r,c,3,'parent',figure1);
 end
 
-% Create an output folder
+if analysis == 1 % Drained Analysis - Volumetric Strain
+  plot(epsV,p);
+  xlabel('Volumetic Strain, \epsilon_v (%)')
+  ylabel('Mean Effective Stress, p (kPa)')
+  title('Mean Effective Stres vs. Volumetric Strain')
+
+else if analysis == 2 % Undrained Analysis - Pore Water Pressure
+       plot(es,u);
+       xlabel('Axial strain, \epsilon_a (%)')
+       ylabel('Excess Pore Water Pressure, u (kPa)')
+       title('Excess Pore Water Pressure Vs. Axial Strain')
+     end
+end
+
+
+%% Plot: Mean effective Stress vs Void Ratio
+if f==2 
+   figure4=figure(4);
+   title('Mean effective stress vs Void Ratio')
+else
+  subplot(r,c,4,'parent',figure1);
+end
+
+semilogx(p,void,pNCL,eNCL,pCSL,eCSL);
+xlabel('Mean Effective Stress (kPa)')
+ylabel('Void ratio')
+
+%% Create an output folder
 status = mkdir('Output');
 cd('Output');
 
+%% Write Plots (Single / Multiple)
 if f==2
   saveas(figure1,'DeviatoricStress_vs_AxialStrain','fig')
   print(figure1,'-depsc2','DeviatoricStress_vs_AxialStrain.eps')
@@ -247,11 +291,20 @@ if f==2
   print(figure2,'-depsc2','StressPath.eps')
   print(figure2,'-dtiff','-r600','StressPath.tiff')
   
-  if analysis == 2 %Undrained Analysis
-    saveas(figure3,'ExcessPWP_vs_AxialStrain','fig')
-    print(figure3,'-depsc2','ExcessPWP_vs_AxialStrain.eps')
-    print(figure3,'-dtiff','-r600','ExcessPWP_vs_AxialStrain.tiff')
+  if analysis == 1 % Drained Analysis
+    saveas(figure3,'MeanEffectiveStress_vs_VolumetricStrain','fig')
+    print(figure3,'-depsc2','MeanEffectiveStress_vs_VolumetricStrain.eps')
+    print(figure3,'-dtiff','-r600','MeanEffectiveStress_vs_VolumetricStrain.tiff')
+  else if analysis == 2 % Undrained Analysis
+	 saveas(figure3,'ExcessPWP_vs_AxialStrain','fig')
+	 print(figure3,'-depsc2','ExcessPWP_vs_AxialStrain.eps')
+	 print(figure3,'-dtiff','-r600','ExcessPWP_vs_AxialStrain.tiff')
+       end
   end
+  saveas(figure4,'Mean_Effective_Stress_vs_Void_Ratio','fig')
+  print(figure4,'-depsc2','Mean_Effective_Stress_vs_Void_Ratio.eps')
+  print(figure4,'-dtiff','-r600','Mean_Effective_Stress_vs_Void_Ratio.tiff')
+  
 else
   saveas(figure1,'MCC','fig')
   print(figure1,'-depsc2','MCC.eps')
